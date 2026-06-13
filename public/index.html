@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Application de chat en temps réel — moderne, rapide et sécurisée." />
+  <title>Ballo Chat — Messagerie Instantanée</title>
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+
+  <!-- Phosphor Icons -->
+  <script src="https://unpkg.com/@phosphor-icons/web@2.1.1/src/index.js" defer></script>
+
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <!-- Auth Modal -->
+  <div class="auth-modal" id="auth-modal">
+    <div class="auth-container">
+      <div class="auth-header">
+        <i class="ph-duotone ph-chats-teardrop logo-icon"></i>
+        <h2 id="auth-title">Bienvenue sur Ballo Chat</h2>
+        <p id="auth-subtitle">Connecte-toi pour continuer</p>
+      </div>
+      <form id="auth-form" class="auth-form">
+        <div class="input-group">
+          <label for="username">Nom d'utilisateur</label>
+          <input type="text" id="username" required autocomplete="username" />
+        </div>
+        <div class="input-group">
+          <label for="password">Mot de passe</label>
+          <input type="password" id="password" required autocomplete="current-password" />
+        </div>
+        <button type="submit" class="auth-btn" id="auth-submit-btn">Connexion</button>
+        <p class="auth-toggle">Pas encore de compte ? <a href="#" id="toggle-auth-mode">S'inscrire</a></p>
+        <p id="auth-error" class="auth-error hidden"></p>
+      </form>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════
+       APP WRAPPER
+  ═══════════════════════════════════════════ -->
+  <div class="app-wrapper hidden" id="app">
+
+    <!-- ── SIDEBAR ── -->
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <div class="logo">
+          <i class="ph-duotone ph-chats-teardrop logo-icon"></i>
+          <span class="logo-text">Ballo Chat</span>
+        </div>
+        <button class="icon-btn" id="toggle-sidebar" aria-label="Fermer le menu" title="Réduire">
+          <i class="ph-bold ph-sidebar-simple"></i>
+        </button>
+      </div>
+
+      <!-- Search & Filters -->
+      <div class="search-bar">
+        <i class="ph ph-magnifying-glass search-icon"></i>
+        <input type="text" id="search-contacts" placeholder="Rechercher..." autocomplete="off" />
+      </div>
+      <div class="contact-filters">
+        <button class="filter-btn active" data-filter="all">Tous</button>
+        <button class="filter-btn" data-filter="online">En ligne</button>
+        <button class="filter-btn" data-filter="offline">Hors ligne</button>
+      </div>
+
+      <!-- Contacts list -->
+      <div class="contacts-list" id="contacts-list" role="list">
+      </div>
+
+      <!-- Sidebar footer -->
+      <div class="sidebar-footer">
+        <div class="my-profile">
+          <div class="contact-avatar" style="--avatar-color:#6366f1">M</div>
+          <div class="contact-info">
+            <span class="contact-name">Moi</span>
+            <span class="contact-preview">En ligne</span>
+          </div>
+        </div>
+        <button class="icon-btn" id="settings-btn" aria-label="Paramètres" title="Paramètres">
+          <i class="ph ph-gear"></i>
+        </button>
+      </div>
+    </aside>
+
+    <!-- ── MAIN CHAT PANEL ── -->
+    <main class="chat-panel" id="chat-panel">
+      
+      <!-- Welcome Overlay -->
+      <div class="welcome-overlay" id="welcome-overlay">
+        <div class="welcome-content">
+          <i class="ph-duotone ph-chats-teardrop welcome-icon"></i>
+          <h2 id="welcome-title">Bienvenue !</h2>
+          <p style="font-size: 1.1rem; color: var(--text-secondary); margin-bottom: 10px;">Prêt à vivre une expérience épique ?</p>
+          <p class="welcome-hint">Sélectionne un utilisateur à gauche pour commencer à discuter.</p>
+        </div>
+      </div>
+
+      <!-- Chat Header -->
+      <header class="chat-header hidden" id="chat-header">
+        <button class="icon-btn mobile-menu-btn" id="mobile-menu-btn" aria-label="Menu">
+          <i class="ph-bold ph-list"></i>
+        </button>
+        <div class="chat-peer">
+          <div class="contact-avatar header-avatar" id="header-avatar"></div>
+          <div>
+            <h1 class="peer-name" id="peer-name"></h1>
+            <span class="peer-status" id="peer-status"></span>
+          </div>
+        </div>
+      </header>
+
+      <!-- Messages Area -->
+      <div class="chat-body hidden" id="chat-body" role="log" aria-live="polite" aria-label="Messages">
+        <div class="chat-messages" id="chat-messages">
+        </div>
+      </div>
+
+      <!-- Typing Indicator -->
+      <div class="typing-indicator hidden" id="typing-indicator">
+        <div class="msg-avatar small" id="typing-avatar"></div>
+        <div class="typing-dots">
+          <span></span><span></span><span></span>
+        </div>
+        <span class="typing-label">En train d'écrire…</span>
+      </div>
+
+      <!-- Input Bar -->
+      <footer class="chat-footer hidden" id="chat-footer">
+        <button class="icon-btn emoji-btn" aria-label="Emojis" title="Emojis" id="emoji-btn">
+          <i class="ph ph-smiley"></i>
+        </button>
+        <div class="input-wrapper">
+          <textarea
+            id="message-input"
+            class="message-input"
+            placeholder="Écrire un message…"
+            rows="1"
+            maxlength="2000"
+            autocomplete="off"
+            aria-label="Champ de saisie du message"
+          ></textarea>
+        </div>
+        <button class="send-btn" id="send-button" aria-label="Envoyer le message" title="Envoyer">
+          <i class="ph-bold ph-paper-plane-tilt"></i>
+        </button>
+      </footer>
+
+    </main>
+
+  </div><!-- /.app-wrapper -->
+
+  <!-- Emoji Picker (simple) -->
+  <div class="emoji-picker hidden" id="emoji-picker" role="dialog" aria-label="Sélecteur d'emojis">
+    <div class="emoji-grid" id="emoji-grid"></div>
+  </div>
+
+  <!-- Profile Edit Modal -->
+  <div class="auth-modal hidden" id="profile-modal">
+    <div class="auth-container">
+      <div class="auth-header">
+        <h2 style="margin-bottom: 20px;">Modifier mon Profil</h2>
+      </div>
+      <form id="profile-form" class="auth-form">
+        <div class="input-group">
+          <label for="edit-username">Nom d'utilisateur</label>
+          <input type="text" id="edit-username" required />
+        </div>
+        <div class="input-group">
+          <label for="edit-color">Couleur de thème</label>
+          <input type="color" id="edit-color" style="height: 45px; cursor: pointer; padding: 2px;" required />
+        </div>
+        <div style="display: flex; gap: 10px; margin-top: 10px;">
+          <button type="button" class="auth-btn" id="close-profile-btn" style="background: var(--bg-surface); flex: 1;">Annuler</button>
+          <button type="submit" class="auth-btn" style="flex: 1;">Sauvegarder</button>
+        </div>
+        <p id="profile-error" class="auth-error hidden"></p>
+      </form>
+    </div>
+  </div>
+
+  <!-- Notification Toast -->
+  <div class="toast-container" id="toast-container" aria-live="assertive"></div>
+
+  <!-- ─────────────────────────────────────── -->
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>
