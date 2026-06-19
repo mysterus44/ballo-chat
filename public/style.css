@@ -968,7 +968,18 @@ body {
 
 .app-wrapper.hidden { display: none; }
 
-/* ── 17. COPYRIGHT ──────────────────────────────────────────── */
+/* ── 17. COPYRIGHT ── */
+.copyright-signature {
+  position: absolute;
+  bottom: 4px;
+  right: 16px;
+  font-size: 0.65rem;
+  color: var(--text-muted);
+  opacity: 0.6;
+  pointer-events: none;
+  z-index: 20;
+}
+
 /*
   Ballo Chat — Application de Messagerie Instantanée
   Créé par : KINGKOUDA
